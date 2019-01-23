@@ -26,53 +26,225 @@
     \end{frame}
 
     \begin{frame}{Kinematic Model}
-        Todo.
+        \justifying
+        Let $\bm{x} = (\bm{p}_t^T, \bm{o}_t^T)^T$ be the pose of $\mathcal{F}_t$
+        wrt $\mathcal{F}_w$. %We want to
+        %develop a filter that estimates the state $\bm{x}$ while
+        %it moves around the environment.
+        Let $\mathcal{F}_s$ be the
+        support foot frame with respect to the world frame and let
+        $\bm{o}_s$ be its orientation.
+        Let $\bm{J}(\bm{q}_s, \bm{o}_s)$ the Jacobian
+        matrix of the kinematic map from the support frame
+        $\mathcal{F}_s$ to the torso frame $\mathcal{F}_t$.
+        
+        Let's use the following kinematic model to describe the
+        evolution of the state $\bm{x}$ through time:
+        \begin{equation*}
+            \bm{\dot{x}} = \bm{J}(\bm{q}_s, \bm{o}_s) \bm{\dot{q}}_s
+        \end{equation*}
+        with $\bm{\dot{q}}_s$ velocities of the support joints
+        acting as control inputs.
+%        Note that the Jacobian
+%        $\bm{J}(\bm{q}_{s}, \bm{o}_s)$ does not depend on the
+%        position of $\mathcal{F}_s$:
+%        \begin{align*}
+%            \bm{f}(\bm{q}_s, \bm{o}_s) %&= \bm{\varOmega} \left(
+                %\begin{bmatrix}
+                %    \bm{R}_z(\bm{o}_s) & \bm{0} \\
+                %    \bm{0}^T & 1
+                %\end{bmatrix}
+                %\bm{\varOmega}^{-1}\left(
+                %\begin{bmatrix}
+                %     \tensor[^s]{\bm{p}}{_t} \\
+                %     \tensor[^s]{\bm{o}}{_t}
+                %\end{bmatrix}
+                %\right)
+                %\right) \\
+                %&= \bm{\varOmega} \left(
+                %\begin{bmatrix}
+                %    \bm{R}_z(\bm{o}_s + \tensor[^s]{\bm{o}}{_{t,z}}) \bm{R}_y(\tensor[^s]{\bm{o}}{_{t,y}}) \bm{R}_x(\tensor[^s]{\bm{o}}{_{t,x}}) & \bm{R}_z(\bm{o}_s) \tensor[^s]{\bm{p}}{_t}  \\
+                %    \bm{0}^T & 1
+                %\end{bmatrix}
+                %\right) \numberthis \\
+%                &=
+%                \begin{bmatrix}
+%                    \bm{R}_z(\bm{o}_s) & \bm{O} \\
+%                    \bm{O} & \bm{I}
+%                \end{bmatrix}
+%                \bm{f}(\bm{q}_s)
+%                +
+%                \begin{pmatrix}
+%                    \bm{0}_{5} \\
+%                    \bm{o}_s
+%                \end{pmatrix} \\
+%            \bm{J}(\bm{q}_s, \bm{o}_s) %&= \frac{\partial \bm{f}(\bm{q}_s, \bm{o}_s)}{\partial \bm{q}_s} \\
+            %&=
+            %\begin{bmatrix}
+            %        \bm{R}_z(\bm{o}_s) & \bm{O} \\
+            %        \bm{O} & \bm{I}
+            %\end{bmatrix}
+            %\frac{\partial \bm{f}(\bm{q}_s)}{\partial \bm{q}_s} \numberthis \\
+%            &=
+%            \begin{bmatrix}
+%                    \bm{R}_z(\bm{o}_s) & \bm{O} \\
+%                    \bm{O} & \bm{I}
+%            \end{bmatrix}
+%            \bm{J}(\bm{q}_s)
+%        \end{align*}
+
+        The robot is equipped with a RGBD camera and an IMU, used
+        to measure the pose of the torso frame:
+        \begin{equation*}
+            \bm{y} = \bm{h}(\bm{x}, \bm{q}_n) =
+                \begin{pmatrix}
+                    \bm{p}_t \\
+                    \bm{o}_t
+                \end{pmatrix}
+        \end{equation*}
     \end{frame}
 
     \begin{frame}{Extended Kalman Filter}
-        Todo.
+        \justifying
+        It is now possible to define a discrete-time stochastic system:
+        \begin{align*}
+            \bm{x}_{k+1} &= \bm{x}_k + T \bm{J}(\bm{q}_{s,k}, \bm{o}_s) \bm{\dot{q}}_{s,k} + \bm{v}_k \\
+            \bm{y}_k &= \bm{h}(\bm{x}_k, \bm{q}_{n,k}) + \bm{w}_k
+        \end{align*}
+        with $k$ current timestep, $T$ sampling interval,
+        $\bm{v}_k \sim \bm{\mathcal{N}}(\bm{0}, \bm{V}_k)$ and
+        $\bm{w}_k \sim \bm{\mathcal{N}}(\bm{0}, \bm{W}_k)$ zero-mean
+        white Gaussian noises and
+        $\bm{V}_k \in \mathbb{R}^{6 \times 6}$,
+        $\bm{W}_k \in \mathbb{R}^{6 \times 6}$ their respective
+        covariance matrices.
+    \end{frame}
+
+    \begin{frame}{Extended Kalman Filter: Prediction}
+        %%% EKF Prediction.
+        \justifying
+        At each timestep $k$, a prediction $\bm{\hat{x}}_{k+1|k}$ is
+        generated using the current estimate $\bm{\hat{x}}_{k}$:
+        \begin{equation*}
+            \bm{\hat{x}}_{k+1|k} = \bm{\hat{x}}_k + \bm{J}(\bm{q}_{s,k}, \bm{o}_s) \Delta \bm{q}_{s,k},
+            \quad \Delta \bm{q}_{s,k} = \bm{q}_{s,k+1} - \bm{q}_{s,k}
+        \end{equation*}
+        with $\Delta \bm{q}_{s,k} \approx T \bm{\dot{q}}_{s,k}$
+        obtained using encoder readings. \\The covariance prediction
+        matrix is updated accordingly:
+        \begin{equation*}
+            \bm{P}_{k+1|k} = \bm{P}_{k} + \bm{V}_{k}
+        \end{equation*}
+        The predicted output
+        associated to $\bm{\hat{x}}_{k+1|k}$ is computed as well:
+        \begin{equation*}
+            \bm{\hat{y}}_{k+1|k} = \bm{h}(\bm{\hat{x}}_{k+1|k}, \bm{q}_{n, k+1})
+        \end{equation*}
+    \end{frame}
+
+    \begin{frame}{Extended Kalman Filter: Correction}
+        %%% EKF Correction.
+        To correct the predicted state we need to compute the innovation:
+        \begin{equation*}
+            \bm{\nu}_{k+1} = \bm{y}_{k+1} - \bm{\hat{y}}_{k+1|k}
+        \end{equation*}
+        It is possible to determine the corrected state estimate by computing:
+        \begin{equation*}
+            \bm{\hat{x}}_{k+1} = \bm{\hat{x}}_{k+1|k} + \bm{G}_{k+1} \bm{\nu}_{k+1}
+        \end{equation*}
+        with $\bm{G}_{k+1}$ Kalman gain matrix, defined as
+        \begin{equation*}
+            \bm{G}_{k+1} = \bm{P}_{k+1|k} \bm{H}_{k+1}^T \left( \bm{H}_{k+1} \bm{P}_{k+1|k} \bm{H}_{k+1}^T + \bm{W}_{k+1} \right)^{-1}
+        \end{equation*}
+        The corrected covariance matrix is updated as well:
+        \begin{equation*}
+            \bm{P}_{k+1} = \bm{P}_{k+1|k} - \bm{G}_{k+1} \bm{H}_{k+1} \bm{P}_{k+1|k}
+        \end{equation*}
+        Note that, in our implementation, we defined $\bm{V}$ and $\bm{W}$ as:
+        \begin{align*}
+            \bm{V} &= \text{diag}\{5, 5, 5, 100, 100, 100 \} \cdot 10^{-6} \\
+            \bm{W} &= \text{diag}\{5, 5, 5, 5 \cdot 10^{-2}, 5 \cdot 10^{-2}, 5 \cdot 10^{-2} \}  \cdot 10^{-2}
+        \end{align*}
     \end{frame}
 
     \begin{frame}{Accelerometer Integration}
-        Todo.
+        Considering constant acceleration $\bm{\ddot{p}}_{t, k}$ in an
+        interval $[t_k, t_{k+1})$:
+        \begin{align*}
+            \bm{\dot{p}}_{t, k+1} &= \bm{\dot{p}}_{t, k} + \bm{\ddot{p}}_{t, k} T \\
+            \bm{p}_{t, k+1} &= \bm{p}_{t, k} + \bm{\dot{p}}_{t, k} T + \frac{1}{2} \bm{\ddot{p}}_{t, k} T^2
+        \end{align*}
+        At each timestep $k$, the accelerometer returns the linear acceleration
+        $\tensor[^t]{\bm{a}}{_{t,k}}$ expressed in $\mathcal{F}_t$.
+        It must be transformed to $\mathcal{F}_w$:
+        \begin{equation*}
+            \bm{\ddot{p}}_{t,k} = \tensor[^w]{\bm{R}}{_t}(\bm{\hat{x}}_{k}) \tensor[^t]{\bm{a}}{_{t,k}}
+        \end{equation*}
+        with:
+        \begin{equation*}
+            \tensor[^w]{\bm{R}}{_t}(\bm{\hat{x}}_{k}) = \bm{R}_z(\gamma) \bm{R}_y(\beta) \bm{R}_x(\alpha)
+        \end{equation*}
+        where $\alpha$, $\beta$ and $\gamma$ are, respectively,
+        the roll, the pitch and the yaw angles of $\bm{\hat{x}}_{k}$.
     \end{frame}
 
     \begin{frame}{Gyroscope Integration}
-        Todo.
-    \end{frame}
-
-    \begin{frame}{IMU}
-        Experiments (5.1).
-    \end{frame}
-
-    \begin{frame}[fragile]{Filtering Linear Velocities}
-      Add to the state an approximated estimation of the velocity in such a way to fix drift accumulation.
-
-      Velocity is obtained using position of the robot in 2 successive frames
-
+        Considering a constant angular velocity in an interval $[t_k, t_{k+1})$:
         \begin{equation*}
-        \bm{\dot{p}}_{t,k} \approx \bm{\dot{\hat{p}}}_{t,k} \approx \bm{\dot{\hat{p}}}_{t,k-1}
-        = \frac{\bm{\hat{p}}_{t,k} - \bm{\hat{p}}_{t,k-1}}{T}
+            \bm{o}_{t,k+1} = \bm{o}_{t,k} + T \bm{\dot{o}}_{t,k}
         \end{equation*}
+        At each timestep $k$, the gyroscope returns the angular velocity in
+        $\tensor[^t]{\bm{\omega}}{_{t,k}}$ expressed in $\mathcal{F}_t$.
+        It must be transformed to $\mathcal{F}_w$:
+        \begin{equation*}
+            \bm{\dot{o}}_{t,k} = \bm{T}(\bm{\hat{x}}_{k}) \tensor[^t]{\bm{\omega}}{_{t,k}}
+        \end{equation*}
+        with:
+        \begin{equation*}
+            \bm{T}(\bm{\hat{x}}_{k}) =
+            \begin{pmatrix}
+                \text{cos}(\gamma)/\text{cos}(\beta) & \text{sin}(\gamma)/\text{cos}(\beta) & 0 \\
+                -\text{sin}(\gamma) &  \text{cos}(\gamma) & 0 \\
+                \text{cos}(\gamma) \text{tan}(\beta) & \text{sin}(\gamma) \text{tan}(\beta) & 1
+            \end{pmatrix}
+        \end{equation*}
+        where $\beta$ and $\gamma$ are, respectively,
+        the pitch and the yaw angles of $\bm{\hat{x}}_{k}$.
+    \end{frame}
 
+    \begin{frame}{EKF with IMU Integration}
+        \begin{figure}
+        \caption{Experiments (5.1).}
+        \centering
+        \includegraphics[width=0.75\textwidth]{images/accelerometer.png}
+        \end{figure}
     \end{frame}
 
     \begin{frame}[fragile]{Filtering Linear Velocities}
+        Add to the state an approximated estimation of the velocity in such a way to fix drift accumulation.
 
-    \begin{figure}
-    \caption{Improves the estimate of $(x, y)^{T}$ coordinates decreasing the error on $z$.}
-    \centering
-    \includegraphics[width=0.5\textwidth]{images/comp_ground_truth_estimated_torso_accelerometer_prevlinearvelocity.jpg}
+        Velocity is obtained using position of the robot in 2 successive frames
+        \begin{equation*}
+            \bm{\dot{p}}_{t,k} \approx \bm{\dot{\hat{p}}}_{t,k} \approx \bm{\dot{\hat{p}}}_{t,k-1}
+            = \frac{\bm{\hat{p}}_{t,k} - \bm{\hat{p}}_{t,k-1}}{T}
+        \end{equation*}
+    \end{frame}
+
+    \begin{frame}[fragile]{Filtering Linear Velocities}
+        \begin{figure}
+        \caption{Improves the estimate of $(x, y)^{T}$ coordinates decreasing the error on $z$.}
+        \centering
+        \includegraphics[width=0.75\textwidth]{images/accelerometer_prev_linearvelocity.png}
     \end{figure}
 
     \end{frame}
 
     \begin{frame}[fragile]{Trilateration}
-      Remove integration and double integration from the calculus of the position.
+        Remove integration and double integration from the calculus of the position.
 
-      Required stuff: RGBD camera posed on the head of the robot, identifiable landmarks with known positions.
+        Required stuff: RGBD camera posed on the head of the robot, identifiable landmarks with known positions.
 
-      TODO: QUI FORSE CI STA UNO SCREENSHOOT PER MOSTRARE LA CONFIGUARZINE... E FOTO TIPO TRILATERATION
+        TODO: QUI FORSE CI STA UNO SCREENSHOOT PER MOSTRARE LA CONFIGUARZINE... E FOTO TIPO TRILATERATION
     \end{frame}
 
     \begin{frame}[fragile]{Trilateration}
@@ -93,19 +265,16 @@
                 }^2 + \bar{r} \quad (i = 1, 2, \dots, n)
         \end{equation*}
 
-
         FOTO TIPO CAMERA MODEL
     \end{frame}
 
     \begin{frame}[fragile]{Trilateration}
-
         Knowing position of each landmarks in the world frame $(x_{i}, y_{i}, z_{i})^{T}$ and its distance from the camera $r_{i}$, find the position of the camera is equal to resolve an equation for landmark
         \begin{equation*}
-        (p_{h,x} - x_i)^2 + (p_{h,y} - y_i)^2 + (p_{h,z} - z_i)^2 = r_i^2 \quad (i = 1, 2, \dots, n)
-    \end{equation*}
+            (p_{h,x} - x_i)^2 + (p_{h,y} - y_i)^2 + (p_{h,z} - z_i)^2 = r_i^2 \quad (i = 1, 2, \dots, n)
+        \end{equation*}
 
         which can be rewritten as linear system $Ax= b$:
-
         \begin{equation*}
         \bm{A} = \begin{pmatrix}
                 x_2 - x_1 & y_2 - y_1 & z_2 - z_1 \\
@@ -141,7 +310,7 @@
 
     \begin{frame}[fragile]{Trilateration}
         Hence, the position of the torso can be determined by:
-          \begin{equation*}
+        \begin{equation*}
             %\begin{pmatrix}
             %    x \\
             %    y \\
@@ -166,7 +335,7 @@
         \begin{figure}
         \caption{Improved estimation for $x, y, z$}
         \centering
-        \includegraphics[width=0.5\textwidth]{images/trilateration.png}
+        \includegraphics[width=0.75\textwidth]{images/trilateration.png}
         \end{figure}
     \end{frame}
 
@@ -183,8 +352,8 @@
     \begin{frame}{MPC Loop CLosure}
     	\begin{figure}
     	    \centering
-    	    \includegraphics[scale=0.2]{images/comp_estimated_torso_com.jpg}
-    	    \label{fig:my_label}
+            \caption{Todo.}
+    	    \includegraphics[scale=0.5]{images/trilateration_com.png}
     	\end{figure}
     \end{frame}
 
