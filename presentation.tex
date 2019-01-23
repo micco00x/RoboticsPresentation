@@ -23,7 +23,16 @@
     \maketitle
 
     \begin{frame}{Introduction}
-        Intro.
+        \begin{itemize}
+            \item Aim of the project following methodology in [1]
+            \item Pose of the torso for localization of robot points using encoder readings.
+            \item Estimate used to close feedback loop in the MPC gait generator
+            \item Estimation done with EKF using standard humanoid sensors
+            \item Use of accelerometer and the gyroscope of the IMU and improving results with a filter
+            \item Trilateration algorithm used as last step
+            \item Testing the behaviour of the EKF through regulation tasks
+            \item C++ and HRP4 robot model in a V-REP environment used
+        \end{itemize}
     \end{frame}
 
     \begin{frame}{Kinematic Model}
@@ -420,7 +429,8 @@
 
     \begin{frame}{Proportional Controller: x-y Plot}
         \begin{figure}
-            \includegraphics[width=0.85\textwidth]{images/proportional_controller.png}
+            \caption{Todo.}
+            \includegraphics[width=0.75\textwidth]{images/proportional_controller.png}
         \end{figure}
     \end{frame}
 
@@ -464,7 +474,8 @@
 
     \begin{frame}{Cartesian Regulation: x-y Plot}
         \begin{figure}
-            \includegraphics[width=0.85\textwidth]{images/cartesian_regulation.png}
+            \caption{Todo.}
+            \includegraphics[width=0.75\textwidth]{images/cartesian_regulation.png}
         \end{figure}
     \end{frame}
 
@@ -504,19 +515,22 @@
 
     \begin{frame}{Posture Regulation: x-y Plot}
         \begin{figure}
-            \includegraphics[width=0.85\textwidth]{images/posture_regulation.png}
+            \caption{Todo.}
+            \includegraphics[width=0.75\textwidth]{images/posture_regulation.png}
         \end{figure}
     \end{frame}
 
     \begin{frame}{Posture Regulation: Yaw Plot}
         \begin{figure}
+            \caption{Todo.}
             \includegraphics[width=\textwidth]{images/yaw_postureregulation.png}
         \end{figure}
     \end{frame}
 
     \begin{frame}{Posture Regulation: Velocity Profile Plots}
         \begin{figure}
-            \includegraphics[width=0.9\textwidth]{images/unicycle_velocities.png}
+            \caption{Todo.}
+            \includegraphics[width=0.8\textwidth]{images/unicycle_velocities.png}
         \end{figure}
     \end{frame}
 
