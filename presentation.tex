@@ -24,14 +24,14 @@
 
     \begin{frame}{Introduction}
         \begin{itemize}
-            \item Aim of the project following methodology in [1]
-            \item Pose of the torso for localization of robot points using encoder readings.
-            \item Estimate used to close feedback loop in the MPC gait generator
-            \item Estimation done with EKF using standard humanoid sensors
-            \item Use of accelerometer and the gyroscope of the IMU and improving results with a filter
-            \item Trilateration algorithm used as last step
-            \item Testing the behaviour of the EKF through regulation tasks
-            \item C++ and HRP4 robot model in a V-REP environment used
+            \item Torso pose estimation on the HRP4 humanoid robot
+            \item Extended Kalman Filter
+            \item IMU measurements and RGBD camera
+            \item Accelerometer and Gyroscope Integration
+            \item Trilateration algorithm
+            \item MPC loop closure
+            \item Cartesian and Posture Regulation
+            \item C++ and HRP4 model in V-REP
         \end{itemize}
     \end{frame}
 
@@ -549,7 +549,12 @@
     \end{frame}
 
     \begin{frame}{Conclusion}
-        Conclusion.
+        \begin{itemize}
+            \item EKF correctly localizes the robot
+            \item RGBD camera improves localization
+            \item MPC gait generator does not work as desired
+            \item VSLAM and sensor fusion
+        \end{itemize}
     \end{frame}
 
     \begin{frame}[standout]
