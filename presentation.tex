@@ -174,13 +174,13 @@
         \end{equation*}
     \end{frame}
 
-    \begin{frame}{Extended Kalman Filter: Correction}
-        Note that, in our implementation, we defined $\bm{V}$ and $\bm{W}$ as:
-        \begin{align*}
-            \bm{V} &= \text{diag}\{5, 5, 5, 100, 100, 100 \} \cdot 10^{-6} \\
-            \bm{W} &= \text{diag}\{5, 5, 5, 5 \cdot 10^{-2}, 5 \cdot 10^{-2}, 5 \cdot 10^{-2} \}  \cdot 10^{-2}
-        \end{align*}
-    \end{frame}
+%    \begin{frame}{Extended Kalman Filter: Correction}
+%        Note that, in our implementation, we defined $\bm{V}$ and $\bm{W}$ as:
+%        \begin{align*}
+%            \bm{V} &= \text{diag}\{5, 5, 5, 100, 100, 100 \} \cdot 10^{-6} \\
+%            \bm{W} &= \text{diag}\{5, 5, 5, 5 \cdot 10^{-2}, 5 \cdot 10^{-2}, 5 \cdot 10^{-2} \}  \cdot 10^{-2}
+%        \end{align*}
+%    \end{frame}
 
     \begin{frame}{Accelerometer Integration}
         Considering a constant acceleration $\bm{\ddot{p}}_{t, k}$ in an
@@ -229,9 +229,9 @@
 
     \begin{frame}{EKF with IMU Integration}
         \begin{figure}
-        \caption{Experiments (5.1).}
-        \centering
-        \includegraphics[width=0.75\textwidth]{images/accelerometer.png}
+        \caption{Estimates of the pose of the torso using IMU measurements.}
+        \vspace{-0.3cm}
+        \includegraphics[width=0.8\textwidth]{images/accelerometer.png}
         \end{figure}
     \end{frame}
 
@@ -247,9 +247,9 @@
 
     \begin{frame}[fragile]{Filtering Linear Velocities}
         \begin{figure}
-        \caption{Improves the estimate of $(x, y)^{T}$ coordinates decreasing the error on $z$.}
-        \centering
-        \includegraphics[width=0.75\textwidth]{images/accelerometer_prev_linearvelocity.png}
+        \caption{Improved estimate of $(x, y)^{T}$ coordinates decreasing the error on $z$.}
+        \vspace{-0.3cm}
+        \includegraphics[width=0.8\textwidth]{images/accelerometer_prev_linearvelocity.png}
     \end{figure}
 
     \end{frame}
@@ -347,9 +347,9 @@
 
     \begin{frame}[fragile]{Trilateration}
         \begin{figure}
-        \caption{Improved estimation for $x, y, z$}
-        \centering
-        \includegraphics[width=0.75\textwidth]{images/trilateration.png}
+        \caption{Further improved estimation for $x, y, z$.}
+        \vspace{-0.3cm}
+        \includegraphics[width=0.8\textwidth]{images/trilateration.png}
         \end{figure}
     \end{frame}
 
@@ -365,8 +365,9 @@
 
     \begin{frame}{MPC Loop CLosure}
     	\begin{figure}
-    	    \centering
-            \caption{Todo.}
+            \caption{Estimated position of the CoM with respect to the
+                ground truth.}
+            \vspace{-0.3cm}
     	    \includegraphics[scale=0.5]{images/trilateration_com.png}
     	\end{figure}
     \end{frame}
@@ -390,7 +391,7 @@
     \section{Regulation}
 
     \begin{frame}{Kinematic Model of the Unicycle}
-        Brief description:
+        Let's model the robot as a unicycle:
         \begin{align*}
             \dot{x} &= v \text{cos}(\theta) \\
             \dot{y} &= v \text{sin}(\theta) \\
@@ -401,7 +402,7 @@
 
     \begin{frame}{Proportional Controller}
         \justifying
-        Control law:
+        Let's consider the following control law:
         \begin{align*}
             v &= k_1 \left\| \bm{p}_g - \bm{\hat{p}}_t \right\| \\
             \omega &= k_2 e_{\theta}
@@ -429,7 +430,10 @@
 
     \begin{frame}{Proportional Controller: x-y Plot}
         \begin{figure}
-            \caption{Todo.}
+            \caption{Trajectory followed by the robot when using the controller
+                defined above. Setting velocities to zero when
+                $\left\|\bm{p}_g - \bm{\hat{p}}_t \right\| < 0.25$.}
+            \vspace{-0.3cm}
             \includegraphics[width=0.75\textwidth]{images/proportional_controller.png}
         \end{figure}
     \end{frame}
@@ -457,7 +461,7 @@
 
     \begin{frame}{Cartesian Regulation}
         \justifying
-        Control law:
+        Let's consider the following control law:
         \begin{align*}
             v &= -k_1 (\tensor[^g]{x}{} \text{cos}(\tensor[^g]{\theta}{}) + \tensor[^g]{y}{} \text{sin}(\tensor[^g]{\theta}{})) \\
             \omega &=  k_2 (\text{Atan2}(\tensor[^g]{y}{}, \tensor[^g]{x}{}) - \tensor[^g]{\theta}{} + \pi)
@@ -474,14 +478,17 @@
 
     \begin{frame}{Cartesian Regulation: x-y Plot}
         \begin{figure}
-            \caption{Todo.}
-            \includegraphics[width=0.75\textwidth]{images/cartesian_regulation.png}
+            \caption{Trajectory followed by the robot when using the controller
+                defined above. Setting velocities to zero when
+                $\left\|\bm{p}_g - \bm{\hat{p}}_t \right\| < 0.2$.}
+            \vspace{-0.3cm}
+            \includegraphics[width=0.8\textwidth]{images/cartesian_regulation.png}
         \end{figure}
     \end{frame}
 
     \begin{frame}{Kinematic Model of the Unicycle in Polar Coordinates}
         \justifying
-        Brief description:
+        Let's model the robot as a unicycle using polar coordinates:
         \begin{align*}
             \dot{\rho}_r &= -v \text{cos}(\gamma_r) \\
             \dot{\gamma}_r &= \frac{\text{sin}(\gamma_r)}{\rho_r}v - \omega \\
@@ -498,7 +505,7 @@
 
     \begin{frame}{Posture Regulation}
         \justifying
-        Control law:
+        Let's consider the following control law:
         \begin{align*}
             v &= k_1 \rho_r \text{cos}(\gamma_r) \\
             w &= k_2 \gamma_r + k_1 \frac{\text{sin}(\gamma_r) \text{cos}(\gamma_r)}{\gamma_r}(\gamma_r + k_3 \delta_r)
@@ -515,22 +522,29 @@
 
     \begin{frame}{Posture Regulation: x-y Plot}
         \begin{figure}
-            \caption{Todo.}
-            \includegraphics[width=0.75\textwidth]{images/posture_regulation.png}
+            \caption{Trajectory followed by the robot when using the controller
+                defined above. Setting velocities to zero when
+                $\rho_r < 0.2$.}
+            \vspace{-0.3cm}
+            \includegraphics[width=0.8\textwidth]{images/posture_regulation.png}
         \end{figure}
     \end{frame}
 
     \begin{frame}{Posture Regulation: Yaw Plot}
         \begin{figure}
-            \caption{Todo.}
+            \caption{Evolution of the yaw while following the trajectory
+                of the previous slide.}
+            \vspace{-0.3cm}
             \includegraphics[width=\textwidth]{images/yaw_postureregulation.png}
         \end{figure}
     \end{frame}
 
     \begin{frame}{Posture Regulation: Velocity Profile Plots}
         \begin{figure}
-            \caption{Todo.}
-            \includegraphics[width=0.8\textwidth]{images/unicycle_velocities.png}
+            \caption{Profiles of the linear velocity $v$ and the angular
+                velocity $w$ used to control the robot.}
+            \vspace{-0.3cm}
+            \includegraphics[width=0.85\textwidth]{images/unicycle_velocities.png}
         \end{figure}
     \end{frame}
 
