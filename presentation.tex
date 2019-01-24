@@ -193,9 +193,9 @@
         $\tensor[^t]{\bm{a}}{_{t,k}}$ expressed in $\mathcal{F}_t$.
         It must be transformed to $\mathcal{F}_w$:
         \begin{equation*}
-            \bm{\ddot{p}}_{t,k} = \tensor[^w]{\bm{R}}{_t}(\bm{\hat{x}}_{k}) \tensor[^t]{\bm{a}}{_{t,k}}
+            \bm{\ddot{p}}_{t,k} = \tensor[^w]{\bm{R}}{_t}(\bm{\hat{x}}_{k}) \tensor[^t]{\bm{a}}{_{t,k}} + \bm{g}
         \end{equation*}
-        with:
+        with $\bm{g} = [0, 0, -g]^T, g = 9.81 \text{m/s}^2$ and with:
         \begin{equation*}
             \tensor[^w]{\bm{R}}{_t}(\bm{\hat{x}}_{k}) = \bm{R}_z(\gamma) \bm{R}_y(\beta) \bm{R}_x(\alpha)
         \end{equation*}
@@ -265,10 +265,11 @@
     \begin{frame}[fragile]{Trilateration}
         Obtain the distance of the landmarks from the camera:
         \begin{align*}
-            ^{cam}{x}{} &= \frac{2 p_x - w}{w} ^{cam}{z}{} \cdot tan\left(\frac{\phi}{2}\right) \\
-            ^{cam}{y}{} &= \frac{2 p_y - h}{h} ^{cam}{z}{} \cdot tan\left(\frac{\phi}{2}\right) \\
-            ^{cam}{z}{} &= (\lambda_f - \lambda) \cdot p_z + \lambda \\
+            \tensor[^{cam}]{x}{} &= \frac{2 p_x - w}{w} \tensor[^{cam}]{z}{} \cdot tan\left(\frac{\phi}{2}\right) \\
+            \tensor[^{cam}]{y}{} &= \frac{2 p_y - h}{h} \tensor[^{cam}]{z}{} \cdot tan\left(\frac{\phi}{2}\right) \\
+            \tensor[^{cam}]{z}{} &= (\lambda_f - \lambda) \cdot p_z + \lambda \\
         \end{align*}
+        \vspace{-1cm}
         \begin{equation*}
             r_i =
             \norm{
@@ -315,7 +316,6 @@
                 b_{n1}
             \end{pmatrix}
     \end{equation*}
-
     \begin{equation*}
         b_{k1} = \frac{1}{2}\left[ r_1^2 + r_k^2 + (x_k - x_1)^2 + (y_k - y_1)^2 + (z_k - z_1)^2 \right] \quad (k = 2, 3, \dots, n)
     \end{equation*}
