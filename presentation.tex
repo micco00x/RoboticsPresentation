@@ -210,7 +210,7 @@
         \end{equation*}
         At each timestep $k$, the gyroscope returns the angular velocity in
         $\tensor[^t]{\bm{\omega}}{_{t,k}}$ expressed in $\mathcal{F}_t$.
-        It must be transformed to $\mathcal{F}_w$:
+        It must be related to $\bm{\dot{o}}_{t,k}$:
         \begin{equation*}
             \bm{\dot{o}}_{t,k} = \bm{T}(\bm{\hat{x}}_{k}) \tensor[^t]{\bm{\omega}}{_{t,k}}
         \end{equation*}
@@ -218,13 +218,13 @@
         \begin{equation*}
             \bm{T}(\bm{\hat{x}}_{k}) =
             \begin{pmatrix}
-                \text{cos}(\gamma)/\text{cos}(\beta) & \text{sin}(\gamma)/\text{cos}(\beta) & 0 \\
-                -\text{sin}(\gamma) &  \text{cos}(\gamma) & 0 \\
-                \text{cos}(\gamma) \text{tan}(\beta) & \text{sin}(\gamma) \text{tan}(\beta) & 1
+                1 & \text{sin}(\alpha) \text{tan}(\beta) & \text{cos}(\alpha) \text{tan}(\beta) \\
+        		0 & \text{cos}(\alpha) & -\text{sin}(\alpha) \\
+        		0 & \text{sin}(\alpha)/\text{cos}(\beta) & \text{cos}(\alpha)/\text{cos}(\beta)
             \end{pmatrix}
         \end{equation*}
-        where $\beta$ and $\gamma$  respectively
-        pitch and yaw angles of $\bm{\hat{x}}_{k}$.
+        where $\alpha$ and $\beta$  respectively
+        roll and pitch angles of $\bm{\hat{x}}_{k}$.
     \end{frame}
 
     \begin{frame}{EKF with IMU Integration}
