@@ -2,6 +2,8 @@
 \usepackage{ragged2e} % \justifying
 \usepackage{bm}
 \usepackage{tensor}
+\usepackage[export]{adjustbox}
+\usepackage{multicol}
 \newcommand\norm[1]{\left\lVert#1\right\rVert}
 \newcommand{\at}[2][]{#1|_{#2}}
 \usetheme{metropolis}           % Use metropolis theme
@@ -193,7 +195,7 @@
         $\tensor[^t]{\bm{a}}{_{t,k}}$ expressed in $\mathcal{F}_t$.
         It must be transformed to $\mathcal{F}_w$:
         \begin{equation*}
-            \bm{\ddot{p}}_{t,k} = \tensor[^w]{\bm{R}}{_t}(\bm{\hat{x}}_{k}) \tensor[^t]{\bm{a}}{_{t,k}} + \bm{g}
+            \bm{\ddot{p}}_{t,k} = \tensor[^w]{\bm{R}}{_t}(\bm{\hat{x}}_{k}) \tensor[^t]{\bm{a}}{_{t,k}} - \bm{g}
         \end{equation*}
         with $\bm{g} = [0, 0, -g]^T, g = 9.81 \text{m/s}^2$ and with:
         \begin{equation*}
@@ -236,9 +238,10 @@
     \end{frame}
 
     \begin{frame}[fragile]{Filtering Linear Velocities}
+        %\justifying
         Add to the state an approximated estimation of the velocity in such a way to fix drift accumulation.
 
-        Velocity is obtained using position of the robot in 2 successive frames
+        Velocity is obtained using estimated position of the robot in two \mbox{successive} frames:
         \begin{equation*}
             \bm{\dot{p}}_{t,k} \approx \bm{\dot{\hat{p}}}_{t,k} \approx \bm{\dot{\hat{p}}}_{t,k-1}
             = \frac{\bm{\hat{p}}_{t,k} - \bm{\hat{p}}_{t,k-1}}{T}
@@ -254,42 +257,66 @@
 
     \end{frame}
 
+    \begin{frame}{Trilateration}
+        \begin{figure}
+            \includegraphics[width=\textwidth]{images/GPS-Trilateration.png}
+        \end{figure}
+    \end{frame}
+
     \begin{frame}[fragile]{Trilateration}
-        Remove integration and double integration from the calculus of the position.
-
-        Required stuff: RGBD camera posed on the head of the robot, identifiable landmarks with known positions.
-
-        TODO: QUI FORSE CI STA UNO SCREENSHOOT PER MOSTRARE LA CONFIGUARZINE... E FOTO TIPO TRILATERATION
+        \begin{columns}[c,onlytextwidth]
+            \column{0.5\textwidth}
+                %\begin{itemize}
+                    {\small
+                        Removes integration and double integration from the calculus of
+                        the position.\\
+                        \vspace{0.25cm}
+                        Requires RGBD camera positioned on the head of the robot,
+                        identifiable landmarks with known positions.}
+                %\end{itemize}
+            \column{0.5\textwidth}
+                \begin{figure}
+                    \includegraphics[width=\textwidth,right]{images/rgbd-tril-1.png}
+                \end{figure}
+        \end{columns}
     \end{frame}
 
     \begin{frame}[fragile]{Trilateration}
         Obtain the distance of the landmarks from the camera:
-        \begin{align*}
-            \tensor[^{cam}]{x}{} &= \frac{2 p_x - w}{w} \tensor[^{cam}]{z}{} \cdot tan\left(\frac{\phi}{2}\right) \\
-            \tensor[^{cam}]{y}{} &= \frac{2 p_y - h}{h} \tensor[^{cam}]{z}{} \cdot tan\left(\frac{\phi}{2}\right) \\
-            \tensor[^{cam}]{z}{} &= (\lambda_f - \lambda) \cdot p_z + \lambda \\
-        \end{align*}
-        \vspace{-1cm}
-        \begin{equation*}
-            r_i =
-            \norm{
-                \begin{pmatrix}
-                    ^{cam}{x}{_i} \\
-                    ^{cam}{y}{_i} \\
-                    ^{cam}{z}{_i}
-                \end{pmatrix}
-                }^2 + \bar{r} \quad (i = 1, 2, \dots, n)
-        \end{equation*}
-
-        FOTO TIPO CAMERA MODEL
+        \vspace{-0.6cm}
+        \begin{multicols}{2}
+            \begin{align*}
+                \tensor[^{cam}]{x}{} &= \frac{2 p_x - w}{w} \tensor[^{cam}]{z}{} \cdot tan\left(\frac{\phi}{2}\right) \\
+                \tensor[^{cam}]{y}{} &= \frac{2 p_y - h}{h} \tensor[^{cam}]{z}{} \cdot tan\left(\frac{\phi}{2}\right) \\
+                \tensor[^{cam}]{z}{} &= (\lambda_f - \lambda) \cdot p_z + \lambda \\
+            \end{align*}\break
+            %\vspace{-1cm}
+            \begin{equation*}
+                r_i =
+                \norm{
+                    \begin{pmatrix}
+                        ^{cam}{x}{_i} \\
+                        ^{cam}{y}{_i} \\
+                        ^{cam}{z}{_i}
+                    \end{pmatrix}
+                    }^2 + \bar{r} \quad (i = 1, 2, \dots, n)
+            \end{equation*}
+        \end{multicols}
+        \vspace{-1.25cm}
+        \begin{figure}
+            \includegraphics[width=\textwidth,height=4.75cm,keepaspectratio]{images/projective-camera.png}
+        \end{figure}
     \end{frame}
 
     \begin{frame}[fragile]{Trilateration}
-        Knowing position of each landmarks in the world frame $(x_{i}, y_{i}, z_{i})^{T}$ and its distance from the camera $r_{i}$, find the position of the camera is equal to resolve an equation for landmark
+        \justifying
+        Knowing the position $(x_{i}, y_{i}, z_{i})^{T}$ of each landmarks in the
+        world frame and its distance $r_{i}$ from the camera, the position
+        $\bm{p}_h$ of the camera can be found by solving:
         \begin{equation*}
             (p_{h,x} - x_i)^2 + (p_{h,y} - y_i)^2 + (p_{h,z} - z_i)^2 = r_i^2 \quad (i = 1, 2, \dots, n)
         \end{equation*}
-        which can be rewritten as linear system $Ax= b$:
+        which can be rewritten as linear system $\bm{Ax}=\bm{b}$:
         \begin{equation*}
         \bm{A} = \begin{pmatrix}
                 x_2 - x_1 & y_2 - y_1 & z_2 - z_1 \\
@@ -323,7 +350,8 @@
     \end{frame}
 
     \begin{frame}[fragile]{Trilateration}
-        Hence, the position of the torso can be determined by:
+        \justifying
+        Hence, the position of the torso can be determined by computing:
         \begin{equation*}
             %\begin{pmatrix}
             %    x \\
@@ -340,8 +368,8 @@
             \end{pmatrix} \quad
             \bm{p}_t = \bm{p}_h - \tensor[^w]{\bm{R}}{_t}(\bm{\hat{x}}_{k}) (\tensor[^t]{\bm{p}}{_h} - \tensor[^t]{\bm{p}}{_t})
         \end{equation*}
-        We need at least 5 landmarks for the computation: 4 for obtain a
-        square matrix, and at least 1 more for execute the pseudoinverse that
+        We need at least 5 landmarks: 4 to obtain a
+        square matrix, and at least 1 more to compute the pseudoinverse that
         bring results also in case of noisy measurements.
     \end{frame}
 
@@ -356,11 +384,12 @@
     \section{MPC Loop Closure}
 
     \begin{frame}{MPC Loop CLosure}
-    	The MPC need the position of the CoM with respect to the support
+        \justifying
+    	The MPC needs the position of the CoM with respect to the support
         foot to close the loop.
 
     	We want to estimate the same position but with the support foot
-        reference frame with roll e pitch (wrt world frame) equal to zero.
+        \mbox{reference} frame with roll and pitch (wrt world frame) equal to zero.
     \end{frame}
 
     \begin{frame}{MPC Loop CLosure}
@@ -373,10 +402,12 @@
     \end{frame}
 
     \begin{frame}{MPC Loop CLosure}
+        \justifying
     	Given the estimate of the pose of the torso
         $(\bm{\hat{p}}_t, \bm{\hat{o}}_t)^T$,
         it is possible to obtain the estimate of the position of the support foot
-        $(\bm{\hat{p}}_s, \bm{\hat{o}}_s)^T$  and of the CoM $(\bm{\hat{p}}_{CoM}, \bm{\hat{o}}_{CoM})^T$  using the kinematics relations.
+        $(\bm{\hat{p}}_s, \bm{\hat{o}}_s)^T$  and of the reference frame
+        attached to the CoM $(\bm{\hat{p}}_{CoM}, \bm{\hat{o}}_{CoM})^T$  using the kinematics relations.
 
         The position of the CoM in a rotated
         reference frame of the support foot $\mathcal{F}_{s'}$ which has the $z$-axis
