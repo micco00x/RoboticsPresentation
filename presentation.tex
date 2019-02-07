@@ -368,9 +368,9 @@
             \end{pmatrix} \quad
             \bm{p}_t = \bm{p}_h - \tensor[^w]{\bm{R}}{_t}(\bm{\hat{x}}_{k}) (\tensor[^t]{\bm{p}}{_h} - \tensor[^t]{\bm{p}}{_t})
         \end{equation*}
-        We need at least 5 landmarks: 4 to obtain a
-        square matrix, and at least 1 more to compute the pseudoinverse that
-        bring results also in case of noisy measurements.
+        We need at least 4 landmarks to solve the linear system. More
+        landmarks reduce the error, in this case the system can be solved
+        by using a pseudoinverse.
     \end{frame}
 
     \begin{frame}[fragile]{Trilateration}
